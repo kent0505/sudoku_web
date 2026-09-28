@@ -35,7 +35,7 @@ void main() async {
           BlocProvider(
             create: (context) => GameBloc(
               repository: context.read<GameRepository>(),
-            )..add(NewGame(level: Level.noob)),
+            )..add(StartGame(level: Level.noob)),
           ),
           BlocProvider(create: (context) => TimerCubit()),
         ],

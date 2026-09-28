@@ -6,9 +6,7 @@ import '../../../core/constants.dart';
 import '../bloc/game_bloc.dart';
 
 class Board extends StatelessWidget {
-  const Board({super.key, required this.onCell});
-
-  final void Function(int index) onCell;
+  const Board({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,10 +29,8 @@ class Board extends StatelessWidget {
                   state.cells.length,
                   (index) {
                     final cell = state.cells[index];
-
                     final row = index ~/ 9;
                     final col = index % 9;
-
                     final isSelected = state.index == index;
                     final isSameLine =
                         state.index ~/ 9 == row || state.index % 9 == col;
@@ -44,7 +40,9 @@ class Board extends StatelessWidget {
                     final isCompleted = state.completedCells.contains(index);
 
                     return GestureDetector(
-                      onTap: () => onCell(index),
+                      onTap: () {
+                        context.read<GameBloc>().add(SelectCell(index: index));
+                      },
                       child: Stack(
                         children: [
                           AnimatedContainer(

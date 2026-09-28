@@ -1,57 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/game_bloc.dart';
 import '../../../core/constants.dart';
+import '../../../core/widgets/button.dart';
 import '../../../core/widgets/svg_widget.dart';
+import '../bloc/game_bloc.dart';
 
 class ActionButtons extends StatelessWidget {
-  const ActionButtons({
-    super.key,
-    required this.onClear,
-    required this.onNote,
-    required this.onHint,
-  });
+  const ActionButtons({super.key, required this.onRestart});
 
-  final VoidCallback onClear;
-  final VoidCallback onNote;
-  final VoidCallback onHint;
+  final VoidCallback onRestart;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _Button(
-          title: 'Clear',
-          asset: Assets.clear,
-          onPressed: onClear,
-        ),
-        BlocBuilder<GameBloc, GameState>(
-          buildWhen: (p, c) => p.notesMode != c.notesMode,
-          builder: (context, state) {
-            return _Button(
+    return BlocBuilder<GameBloc, GameState>(
+      builder: (context, state) {
+        if (state.stopped) {
+          return Button(
+            onPressed: onRestart,
+            child: Center(
+              child: Text(
+                'Restart',
+                style: TextStyle(
+                  color: context.colors.primary,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _Button(
+              title: 'Clear',
+              asset: Assets.clear,
+              onPressed: () {
+                context.read<GameBloc>().add(ClearCell());
+              },
+            ),
+            _Button(
               title: 'Note',
               data: state.notesMode ? 'ON' : 'OFF',
               active: state.notesMode,
               asset: Assets.note,
-              onPressed: onNote,
-            );
-          },
-        ),
-        BlocBuilder<GameBloc, GameState>(
-          buildWhen: (p, c) => p.hints != c.hints,
-          builder: (context, state) {
-            return _Button(
+              onPressed: () {
+                context.read<GameBloc>().add(ToggleNotes());
+              },
+            ),
+            _Button(
               title: 'Hint',
               data: state.hints.toString(),
               active: state.hints >= 1,
               asset: Assets.hint,
-              onPressed: onHint,
-            );
-          },
-        ),
-      ],
+              onPressed: () {
+                context.read<GameBloc>().add(UseHint());
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

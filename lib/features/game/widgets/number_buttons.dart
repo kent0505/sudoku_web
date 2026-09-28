@@ -6,9 +6,7 @@ import '../../../core/constants.dart';
 import '../../../core/widgets/button.dart';
 
 class NumberButtons extends StatelessWidget {
-  const NumberButtons({super.key, required this.onNumber});
-
-  final void Function(int) onNumber;
+  const NumberButtons({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +29,7 @@ class NumberButtons extends StatelessWidget {
 
                 return Button(
                   onPressed: () {
-                    onNumber(number);
+                    context.read<GameBloc>().add(WriteNumber(value: number));
                   },
                   child: Text(
                     number.toString(),

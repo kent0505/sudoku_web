@@ -21,7 +21,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         super(GameState.initial()) {
     on<GameEvent>(
       (event, emit) => switch (event) {
-        NewGame() => _newGame(event, emit),
+        StartGame() => _startGame(event, emit),
+        StopGame() => _stopGame(event, emit),
         SelectCell() => _selectCell(event, emit),
         WriteNumber() => _writeNumber(event, emit),
         UseHint() => _useHint(event, emit),
@@ -31,8 +32,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     );
   }
 
-  void _newGame(
-    NewGame event,
+  void _startGame(
+    StartGame event,
     Emitter<GameState> emit,
   ) async {
     final cells = _sudoku.generateSolved();
@@ -46,14 +47,25 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       level: event.level,
       cells: cells,
       mistakes: 0,
+      stopped: false,
       hints: event.isWin ? await _repository.saveHints(hints + 3) : hints,
     ));
+  }
+
+  void _stopGame(
+    StopGame event,
+    Emitter<GameState> emit,
+  ) {
+    logger('STOP');
+    if (state.stopped) return;
+    emit(state.copyWith(stopped: true));
   }
 
   void _selectCell(
     SelectCell event,
     Emitter<GameState> emit,
   ) {
+    if (state.gameOver) return;
     final index = event.index;
     final cell = state.cells[index];
     logger(cell.number);
@@ -64,6 +76,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     WriteNumber event,
     Emitter<GameState> emit,
   ) async {
+    if (state.gameOver) return;
     final cell = state.cells[state.index];
     final value = event.value;
     if (cell.opened || cell.value == cell.number) return;
@@ -91,6 +104,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     UseHint event,
     Emitter<GameState> emit,
   ) async {
+    if (state.gameOver) return;
     final cells = List<Cell>.from(state.cells)..shuffle();
     final cell = cells.firstWhereOrNull((element) => element.value == 0);
     if (cell == null) return;
@@ -109,6 +123,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     ClearCell event,
     Emitter<GameState> emit,
   ) async {
+    if (state.gameOver) return;
     final cell = state.cells[state.index];
     if (cell.value == cell.number ||
         cell.opened ||
@@ -123,6 +138,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     ToggleNotes event,
     Emitter<GameState> emit,
   ) {
+    if (state.gameOver) return;
     emit(state.copyWith(notesMode: !state.notesMode));
   }
 

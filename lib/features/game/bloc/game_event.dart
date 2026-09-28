@@ -3,8 +3,8 @@ part of 'game_bloc.dart';
 @immutable
 sealed class GameEvent {}
 
-final class NewGame extends GameEvent {
-  NewGame({
+final class StartGame extends GameEvent {
+  StartGame({
     required this.level,
     this.isWin = false,
   });
@@ -12,6 +12,8 @@ final class NewGame extends GameEvent {
   final Level level;
   final bool isWin;
 }
+
+final class StopGame extends GameEvent {}
 
 final class SelectCell extends GameEvent {
   SelectCell({required this.index});
