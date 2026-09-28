@@ -25,12 +25,15 @@ class NumberButtons extends StatelessWidget {
                     .where((c) => c.value == number && c.value == c.number)
                     .length;
 
-                if (amount == 9) return const SizedBox(height: 44);
+                if (amount == 9 || state.stopped) {
+                  return const SizedBox(height: 44);
+                }
 
                 return Button(
                   onPressed: () {
                     context.read<GameBloc>().add(WriteNumber(value: number));
                   },
+                  minSize: 44,
                   child: Text(
                     number.toString(),
                     style: TextStyle(
