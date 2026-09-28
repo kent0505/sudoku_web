@@ -39,8 +39,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     _sudoku.shuffleSudoku(cells);
     _sudoku.generatePuzzle(cells, event.level.openedCount);
 
-    // final hints = _repository.getHints();
-    final hints = 100;
+    final hints = _repository.getHints();
+    // final hints = 100;
 
     emit(state.copyWith(
       level: event.level,
